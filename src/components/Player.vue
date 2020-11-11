@@ -59,7 +59,7 @@
             Gain:
             <br/>
             <input type="range" v-model="gain" @change="persist"
-              min="0.1" max="1" step="0.01"/>
+              min="0.01" max="0.5" step="0.01"/>
           </label>
         </section>
 
@@ -97,7 +97,7 @@ export default {
 
       scaleNames: SCALE_NAMES,
       toggleScales: SCALE_NAMES.map(() => true),
-      gain: 0.25,
+      gain: 0.125,
       melody: '1,2,3,4,5,6,7,8',
       bpm: 120,
 
