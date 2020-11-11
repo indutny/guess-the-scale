@@ -1,4 +1,6 @@
-# modes
+# Guess the Scale?
+
+Mini-game with a mini-purpose.
 
 ## Project setup
 ```
