@@ -97,7 +97,7 @@ export default {
 
       scaleNames: SCALE_NAMES,
       toggleScales: SCALE_NAMES.map(() => true),
-      gain: 0.5,
+      gain: 0.25,
       melody: '1,2,3,4,5,6,7,8',
       bpm: 120,
 
