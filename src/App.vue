@@ -80,4 +80,41 @@ footer {
 footer small, footer a {
   color: #bebdbf;
 }
+
+input, button {
+  margin: 0.5rem 0.25rem;
+  padding: 0 0.5rem;
+  background: #FEFCFF;
+
+  border: 1px solid #4F4F4F;
+  font-size: 2rem;
+
+  border-radius: 0.25rem;
+  transition: box-shadow 0.1s;
+}
+
+input:hover, button:hover {
+  border-color: #212121;
+}
+
+input[type="submit"]:not(:disabled):hover, button:hover {
+  background: #3F3FD4;
+  color: #FEFCFF;
+  box-shadow: 0 0 0.25rem #3F3FD4;
+}
+
+input:focus, button:focus {
+  box-shadow: 0 0 0.25rem #3F3FD4;
+  outline: none;
+}
+
+input[type="submit"]:disabled {
+  background: #d8d6d8;
+  color: #424242;
+}
+
+input[type="submit"]:not(:disabled), button {
+  cursor: pointer;
+}
+
 </style>

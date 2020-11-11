@@ -35,7 +35,9 @@
         <p><b>{{scale}}</b></p>
       </span>
 
-      <button class="repeat" @click.prevent="onStart">Next Scale</button>
+      <button class="repeat" v-focus @click.prevent="onStart">
+        Next Scale
+      </button>
     </span>
 
     <div class="config">
@@ -201,36 +203,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-input, button {
-  margin: 0.5rem 0.25rem;
-  padding: 0 0.5rem;
-  background: #FEFCFF;
-
-  border: 1px solid #4F4F4F;
-  font-size: 2rem;
-
-  border-radius: 0.25rem;
-}
-
-input:hover, button:hover {
-  border-color: #212121;
-}
-
-input[type="submit"]:not(:disabled):hover, button:hover {
-  background: #3F3FD4;
-  color: #FEFCFF;
-  box-shadow: 0 0 3px #3F3FD4;
-}
-
-input[type="submit"]:disabled {
-  background: #d8d6d8;
-  color: #424242;
-}
-
-input[type="submit"]:not(:disabled), button {
-  cursor: pointer;
-}
-
 .config {
   margin-top: 4rem;
 }
