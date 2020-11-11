@@ -3,6 +3,15 @@
     <h1>Guess the scale?</h1>
 
     <Player/>
+
+    <footer>
+      <small>
+        Made by
+        <a href="https://github.com/indutny/guess-the-scale" target="_blank">
+          @indutny
+        </a>
+      </small>
+    </footer>
   </div>
 </template>
 
@@ -62,5 +71,13 @@ body {
 #app {
   margin: 0 auto;
   max-width: 640px;
+}
+
+footer {
+  margin-top: 1rem;
+}
+
+footer small, footer a {
+  color: #bebdbf;
 }
 </style>
