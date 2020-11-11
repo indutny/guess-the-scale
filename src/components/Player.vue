@@ -153,7 +153,7 @@ export default {
       if (/^ma/.test(guess)) {
         guess = 'ionian';
       } else if (/^min/.test(guess)) {
-        guess = 'natural';
+        guess = 'aeolian';
       }
       const matching = this.scaleNames.filter((scale) => {
         return scale.toLowerCase().startsWith(guess);
@@ -273,7 +273,7 @@ export default {
 
 .config .scale-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .config .scale-list .scale {
