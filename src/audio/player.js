@@ -29,7 +29,16 @@ export default class Player {
 
     this.harmony.connect(this.gain);
     this.melody.connect(this.gain);
-    this.gain.connect(this.context.destination);
+
+    this.compressor = this.context.createDynamicsCompressor();
+    this.gain.connect(this.compressor);
+    this.compressor.connect(this.context.destination);
+
+    // Limiter
+    this.compressor.threshold.value = -1;
+    this.compressor.attack.value = 0.001;
+    this.compressor.release.value = 0.050;
+    this.compressor.ratio.value = 1000;
   }
 
   setGain(value) {
@@ -93,7 +102,7 @@ export default class Player {
     for (const { note, duration } of melody) {
       if (note !== 'rest') {
         this.melody.play(start + total, this.note(scale, base, 7 + note), {
-          gain: 0.75,
+          gain: 0.5,
           duration: duration * eight,
         });
       }
@@ -101,7 +110,7 @@ export default class Player {
     }
 
     // Shell chord
-    const long = { gain: 1, duration: total };
+    const long = { gain: 0.7, duration: total };
     this.harmony.play(start, this.note(scale, base, -7), long);
     this.harmony.play(start, this.note(scale, base, 0), long);
     this.harmony.play(start, this.note(scale, base, 2), long);

@@ -58,7 +58,8 @@
           <label>
             Gain:
             <br/>
-            <input type="range" v-model="gain" min="0.1" max="1" step="0.01"/>
+            <input type="range" v-model="gain" @change="persist"
+              min="0.1" max="1" step="0.01"/>
           </label>
         </section>
 
@@ -96,7 +97,7 @@ export default {
 
       scaleNames: SCALE_NAMES,
       toggleScales: SCALE_NAMES.map(() => true),
-      gain: 1,
+      gain: 0.5,
       melody: '1,2,3,4,5,6,7,8',
       bpm: 120,
 
@@ -168,7 +169,6 @@ export default {
       if (this.player) {
         this.player.setGain(newGain);
       }
-      this.persist();
     },
   },
 
@@ -234,11 +234,11 @@ export default {
 
     lazyPlayer() {
       // Create audio player on click
-      if (!this.cachedPlayer) {
-        this.cachedPlayer = new ScalePlayer();
-        this.cachedPlayer.setGain(this.gain);
+      if (!this.player) {
+        this.player = new ScalePlayer();
+        this.player.setGain(this.gain);
       }
-      return this.cachedPlayer;
+      return this.player;
     },
 
     persist() {

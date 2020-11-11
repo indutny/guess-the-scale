@@ -13,9 +13,9 @@ export default class Oscillator {
         ...this.options.gain,
       },
       filter: {
-        ground: 600,
-        attack: { time: 0.02, value: 7000 },
-        sustain: { time: 0, value: 6000 },
+        ground: 1000,
+        attack: { time: 0.0, value: 7000 },
+        sustain: { time: 5, value: 6000 },
         release: { time: 0.2 },
         ...this.options.filter,
       },
