@@ -12,6 +12,12 @@ export default class Synthesizer {
     }
   }
 
+  connect(destination) {
+    for (const v of this.voices) {
+      v.osc.connect(destination);
+    }
+  }
+
   play(time, note, params) {
     const first = this.voices[0];
     // Start at C3

@@ -22,6 +22,17 @@ export default class Player {
 
     this.harmony = new Synthesizer(this.context, { type: 'triangle' });
     this.melody = new Synthesizer(this.context);
+
+    this.gain = this.context.createGain();
+    this.gain.gain.setValueAtTime(1, this.context.currentTime);
+
+    this.harmony.connect(this.gain);
+    this.melody.connect(this.gain);
+    this.gain.connect(this.context.destination);
+  }
+
+  setGain(value) {
+    this.gain.gain.setValueAtTime(value, this.context.currentTime);
   }
 
   playScale(name, { base, bpm = 240 } = {}) {

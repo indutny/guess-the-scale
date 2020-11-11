@@ -38,15 +38,25 @@
     </span>
 
     <div class="config">
-      <h4>Configuration:</h4>
+      <h4 @click.prevent="onToggleConfig">[Configuration]</h4>
 
-      <div class="scale-list">
-        <div class="scale" v-for="(scale, index) in scaleNames" :key="scale">
+      <div v-if="showConfig">
+        <div class="scale-list">
+          <div class="scale" v-for="(scale, index) in scaleNames" :key="scale">
+            <label>
+              <input type="checkbox" @change="persist" v-model="toggleScales[index]"/>
+              {{scale}}
+            </label>
+            <button @click.prevent="onToggleScale(scale)">Play</button>
+          </div>
+        </div>
+
+        <div class="gain">
           <label>
-            <input type="checkbox" @change="persist" v-model="toggleScales[index]"/>
-            {{scale}}
+            Gain:
+            <br/>
+            <input type="range" v-model="gain" min="0.25" max="1" step="0.01"/>
           </label>
-          <button @click.prevent="onToggle(scale)">Play</button>
         </div>
       </div>
     </div>
@@ -63,7 +73,9 @@ export default {
       player: new ScalePlayer(),
       scaleNames: SCALE_NAMES,
       toggleScales: SCALE_NAMES.map(() => true),
+      gain: 1,
 
+      showConfig: false,
       state: 'idle',
       score: 0,
       best: 0,
@@ -82,6 +94,9 @@ export default {
     }
     if (localStorage.best) {
       this.best = JSON.parse(localStorage.best);
+    }
+    if (localStorage.gain) {
+      this.gain = JSON.parse(localStorage.gain);
     }
   },
 
@@ -107,6 +122,13 @@ export default {
       }
 
       return matching[0];
+    }
+  },
+
+  watch: {
+    gain(newGain) {
+      this.player.setGain(newGain);
+      this.persist();
     }
   },
 
@@ -152,8 +174,12 @@ export default {
       this.multiplier = 1 + Math.floor(Math.log(this.streak) / Math.log(2));
     },
 
-    onToggle(scale) {
+    onToggleScale(scale) {
       this.player.playScale(scale, { base: 0 });
+    },
+
+    onToggleConfig() {
+      this.showConfig = !this.showConfig;
     },
 
     // Helpers
@@ -161,6 +187,7 @@ export default {
     persist() {
       localStorage.toggleScales = JSON.stringify(this.toggleScales);
       localStorage.best = JSON.stringify(this.best);
+      localStorage.gain = JSON.stringify(this.gain);
     }
   }
 }
@@ -197,6 +224,11 @@ input[type="submit"], button {
   margin-top: 4rem;
 }
 
+.config h4 {
+  cursor: pointer;
+  user-select: none;
+}
+
 .config .scale-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -210,6 +242,17 @@ input[type="submit"], button {
   margin-left: 0.5rem;
   font-size: 1rem;
   padding: 0 0.25rem;
+}
+
+.config .gain label {
+  line-height: 2rem;
+}
+
+.config .gain input {
+  margin: 0;
+  padding: 0;
+  margin-left: 0.25rem;
+  width: 100%;
 }
 
 .wrong b {

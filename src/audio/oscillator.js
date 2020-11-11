@@ -31,9 +31,12 @@ export default class Oscillator {
 
     this.osc.connect(this.filter);
     this.filter.connect(this.gain);
-    this.gain.connect(context.destination);
 
     this.osc.start();
+  }
+
+  connect(destination) {
+    this.gain.connect(destination);
   }
 
   envelope(param, time, duration, options) {
