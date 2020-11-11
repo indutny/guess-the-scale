@@ -18,6 +18,7 @@ export const SCALE_NAMES = Object.keys(SCALES);
 
 export default class Player {
   constructor() {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.context = new AudioContext();
 
     this.harmony = new Synthesizer(this.context, { type: 'triangle' });

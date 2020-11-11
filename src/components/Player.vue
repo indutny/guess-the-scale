@@ -73,7 +73,7 @@ export default {
   name: 'Player',
   data() {
     return {
-      player: new ScalePlayer(),
+      player: null,
       scaleNames: SCALE_NAMES,
       toggleScales: SCALE_NAMES.map(() => true),
       gain: 1,
@@ -104,7 +104,9 @@ export default {
   },
 
   unmounted() {
-    this.player.close();
+    if (this.player) {
+      this.player.close();
+    }
   },
 
   computed: {
@@ -142,6 +144,11 @@ export default {
 
   methods: {
     onStart() {
+      // Create audio player on click
+      if (!this.player) {
+        this.player = new ScalePlayer();
+      }
+
       this.state = 'guessing';
       this.guess = '';
 
