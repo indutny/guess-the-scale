@@ -9,10 +9,10 @@
     <span v-if="state === 'idle'">
       <button class="start" @click.prevent="onStart">Start</button>
     </span>
-    <span v-else-if="state === 'guessing'">
+    <span v-else-if="state === 'guessing'" class="guessing">
       <form @submit.prevent="onGuess">
         <div class="row">
-          <input v-focus v-model="guess"/>
+          <input v-focus v-model="guess" placeholder="Scale name"/>
           <input type="submit" :disabled="!matchedScale" value="Check"/>
         </div>
 
@@ -34,6 +34,7 @@
         <p>It was</p>
         <p><b>{{scale}}</b></p>
       </span>
+
       <button class="repeat" @click.prevent="onStart">Next Scale</button>
     </span>
 
@@ -112,7 +113,12 @@ export default {
     },
 
     matchedScale() {
-      const guess = this.guess.toLowerCase();
+      let guess = this.guess.toLowerCase();
+      if (/^ma/.test(guess)) {
+        guess = 'ionian';
+      } else if (/^min/.test(guess)) {
+        guess = 'natural';
+      }
       const matching = this.scaleNames.filter((scale) => {
         return scale.toLowerCase().startsWith(guess);
       });
@@ -210,13 +216,18 @@ input:hover, button:hover {
   border-color: #212121;
 }
 
-input[type="submit"]:hover, button:hover {
+input[type="submit"]:not(:disabled):hover, button:hover {
   background: #3F3FD4;
   color: #FEFCFF;
   box-shadow: 0 0 3px #3F3FD4;
 }
 
-input[type="submit"], button {
+input[type="submit"]:disabled {
+  background: #d8d6d8;
+  color: #424242;
+}
+
+input[type="submit"]:not(:disabled), button {
   cursor: pointer;
 }
 
@@ -266,5 +277,13 @@ input[type="submit"], button {
 
 .wrong b.actual {
   color: #D43F3F;
+}
+
+.repeat {
+  margin-top: 2rem;
+}
+
+.score {
+  margin-bottom: 2rem;
 }
 </style>

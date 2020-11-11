@@ -1,7 +1,7 @@
 import Oscillator from './oscillator';
 
 export default class Synthesizer {
-  constructor(context, { type, voices = 128 } = {}) {
+  constructor(context, { type, voices = 8 } = {}) {
     this.context = context;
     this.voices = [];
     for (let i = 0; i < voices; i++) {
