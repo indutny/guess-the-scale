@@ -7,12 +7,12 @@
     </h3>
 
     <span v-if="state === 'idle'">
-      <button class="start" @click.prevent="onStart">Start</button>
+      <button v-focus class="start" @click.prevent="onStart">Start</button>
     </span>
     <span v-else-if="state === 'guessing'" class="guessing">
       <form @submit.prevent="onGuess">
         <div class="row">
-          <input v-focus v-model="guess" placeholder="Scale name"/>
+          <input v-focus autofocus v-model="guess" placeholder="Scale name"/>
           <input type="submit" :disabled="!matchedScale" value="Check"/>
         </div>
 
@@ -44,7 +44,7 @@
       <h4 @click.prevent="onToggleConfig">[Configuration]</h4>
 
       <div v-if="showConfig">
-        <div class="scale-list">
+        <section class="scale-list">
           <div class="scale" v-for="(scale, index) in scaleNames" :key="scale">
             <label>
               <input type="checkbox" @change="persist" v-model="toggleScales[index]"/>
@@ -52,15 +52,34 @@
             </label>
             <button @click.prevent="onToggleScale(scale)">Play</button>
           </div>
-        </div>
+        </section>
 
-        <div class="gain">
+        <section class="gain">
           <label>
             Gain:
             <br/>
-            <input type="range" v-model="gain" min="0.25" max="1" step="0.01"/>
+            <input type="range" v-model="gain" min="0.1" max="1" step="0.01"/>
           </label>
-        </div>
+        </section>
+
+        <section class="melody">
+          <label>
+            Melody:
+            <br/>
+            <input
+              v-model="melody" @change="persist" placeholder="1,2,3,4,5,6,7,8"/>
+          </label>
+        </section>
+
+        <section class="bpm">
+          <label>
+            BPM:
+            <br/>
+            <input
+              type="number"
+              v-model="bpm" @change="persist" placeholder="120"/>
+          </label>
+        </section>
       </div>
     </div>
   </div>
@@ -74,9 +93,12 @@ export default {
   data() {
     return {
       player: null,
+
       scaleNames: SCALE_NAMES,
       toggleScales: SCALE_NAMES.map(() => true),
       gain: 1,
+      melody: '1,2,3,4,5,6,7,8',
+      bpm: 120,
 
       showConfig: false,
       state: 'idle',
@@ -100,6 +122,12 @@ export default {
     }
     if (localStorage.gain) {
       this.gain = JSON.parse(localStorage.gain);
+    }
+    if (localStorage.melody) {
+      this.melody = JSON.parse(localStorage.melody);
+    }
+    if (localStorage.bpm) {
+      this.bpm = JSON.parse(localStorage.bpm);
     }
   },
 
@@ -132,23 +160,20 @@ export default {
       }
 
       return matching[0];
-    }
+    },
   },
 
   watch: {
     gain(newGain) {
-      this.player.setGain(newGain);
+      if (this.player) {
+        this.player.setGain(newGain);
+      }
       this.persist();
-    }
+    },
   },
 
   methods: {
     onStart() {
-      // Create audio player on click
-      if (!this.player) {
-        this.player = new ScalePlayer();
-      }
-
       this.state = 'guessing';
       this.guess = '';
 
@@ -157,15 +182,23 @@ export default {
 
       let newBase;
       do {
-        newBase = Math.floor(Math.random() * 12);
+        newBase = Math.floor(Math.random() * 12) - 6;
       } while (newBase === this.base);
       this.base = newBase;
 
-      this.player.playScale(this.scale, { base: this.base });
+      this.lazyPlayer().playScale(this.scale, {
+        base: this.base,
+        bpm: this.bpm,
+        melody: this.melody,
+      });
     },
 
     onRepeat() {
-      this.player.playScale(this.scale, { base: this.base });
+      this.lazyPlayer().playScale(this.scale, {
+        base: this.base,
+        bpm: this.bpm,
+        melody: this.melody,
+      });
     },
 
     onSkip() {
@@ -190,7 +223,7 @@ export default {
     },
 
     onToggleScale(scale) {
-      this.player.playScale(scale, { base: 0 });
+      this.lazyPlayer().playScale(scale, { base: 0, bpm: this.bpm });
     },
 
     onToggleConfig() {
@@ -199,10 +232,21 @@ export default {
 
     // Helpers
 
+    lazyPlayer() {
+      // Create audio player on click
+      if (!this.cachedPlayer) {
+        this.cachedPlayer = new ScalePlayer();
+        this.cachedPlayer.setGain(this.gain);
+      }
+      return this.cachedPlayer;
+    },
+
     persist() {
       localStorage.toggleScales = JSON.stringify(this.toggleScales);
       localStorage.best = JSON.stringify(this.best);
       localStorage.gain = JSON.stringify(this.gain);
+      localStorage.melody = JSON.stringify(this.melody);
+      localStorage.bpm = JSON.stringify(this.bpm);
     }
   }
 }
@@ -262,7 +306,7 @@ export default {
   margin-top: 2rem;
 }
 
-.score {
+.config .section:not(:last-child) {
   margin-bottom: 2rem;
 }
 </style>

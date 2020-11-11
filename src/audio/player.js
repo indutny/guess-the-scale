@@ -36,33 +36,75 @@ export default class Player {
     this.gain.gain.setValueAtTime(value, this.context.currentTime);
   }
 
-  playScale(name, { base, bpm = 240 } = {}) {
+  note(scale, base, index) {
+    let shift = 0;
+    while (index >= 7) {
+      shift++;
+      index -= 7;
+    }
+    while (index < 0) {
+      shift--;
+      index += 7;
+    }
+    return base + scale[index % 7] + shift * 12;
+  }
+
+  parseMelody(melody) {
+    const notes = melody.toLowerCase().split(/[^r\d+]/g)
+      .filter((n) => n)
+      .map((n) => {
+        // Rest
+        if (n === 'r') {
+          return 'rest';
+        }
+        return parseInt(n, 10) - 1;
+      });
+
+    const out = [];
+    for (const n of notes) {
+      const last = out[out.length - 1];
+      if (last && last.note === n) {
+        last.duration++;
+      } else {
+        out.push({ note: n, duration: 1 });
+      }
+    }
+    return out;
+  }
+
+  playScale(name, { base, melody = '1,2,3,4,5,6,7,8', bpm = 120 } = {}) {
     const start = this.context.currentTime;
 
-    const duration = 60 / bpm;
+    const eight = 60 / bpm / 2;
 
-    this.harmony.stop(start);
-    this.melody.stop(start);
+    let total = 0;
 
-    const mode = SCALES[name];
+    melody = this.parseMelody(melody);
+
+    const scale = SCALES[name];
 
     if (base === undefined) {
       base = Math.floor(Math.random() * 12);
     }
 
-    const long = { gain: 1, duration: duration * (1 + mode.length) };
-    const short = { gain: 0.75, duration };
+    this.harmony.stop(start);
+    this.melody.stop(start);
+
+    for (const { note, duration } of melody) {
+      if (note !== 'rest') {
+        this.melody.play(start + total, this.note(scale, base, 7 + note), {
+          gain: 0.75,
+          duration: duration * eight,
+        });
+      }
+      total += duration * eight;
+    }
 
     // Shell chord
-    this.harmony.play(start, base - 12 + mode[0], long);
-    this.harmony.play(start, base + mode[0], long);
-    this.harmony.play(start, base + mode[2], long);
-
-    for (let i = 0; i < mode.length; i++) {
-      this.melody.play(start + i * duration, base + 12 + mode[i], short);
-    }
-    this.melody.play(start + mode.length * duration,
-      base + 24 + mode[0], short);
+    const long = { gain: 1, duration: total };
+    this.harmony.play(start, this.note(scale, base, -7), long);
+    this.harmony.play(start, this.note(scale, base, 0), long);
+    this.harmony.play(start, this.note(scale, base, 2), long);
 
     return { base };
   }
