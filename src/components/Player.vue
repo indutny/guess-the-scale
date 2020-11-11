@@ -47,10 +47,13 @@
         <section class="scale-list">
           <div class="scale" v-for="(scale, index) in scaleNames" :key="scale">
             <label>
-              <input type="checkbox" @change="persist" v-model="toggleScales[index]"/>
+              <input
+                type="checkbox"
+                @change="onToggleScale(scale)"
+                v-model="toggleScales[index]"/>
               {{scale}}
             </label>
-            <button @click.prevent="onToggleScale(scale)">Play</button>
+            <button @click.prevent="onPlayScale(scale)">Play</button>
           </div>
         </section>
 
@@ -222,7 +225,12 @@ export default {
       this.multiplier = 1 + Math.floor(Math.log(this.streak) / Math.log(2));
     },
 
-    onToggleScale(scale) {
+    onToggleScale() {
+      this.state = 'idle';
+      this.persist();
+    },
+
+    onPlayScale(scale) {
       this.lazyPlayer().playScale(scale, { base: 0, bpm: this.bpm });
     },
 
