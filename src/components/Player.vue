@@ -12,7 +12,8 @@
     <span v-else-if="state === 'guessing'" class="guessing">
       <form @submit.prevent="onGuess">
         <div class="row">
-          <input v-focus autofocus v-model="guess" placeholder="Scale name"/>
+          <input v-focus autofocus v-model="guess" class="guess"
+            placeholder="Scale name"/>
           <input type="submit" :disabled="!matchedScale" value="Check"/>
         </div>
 
@@ -45,15 +46,19 @@
 
       <div v-if="showConfig">
         <section class="scale-list">
-          <div class="scale" v-for="(scale, index) in scaleNames" :key="scale">
-            <label>
-              <input
-                type="checkbox"
-                @change="onToggleScale(scale)"
-                v-model="toggleScales[index]"/>
-              {{scale}}
-            </label>
-            <button @click.prevent="onPlayScale(scale)">Play</button>
+          <div class="scale-column"
+               v-for="group in scaleGroups"
+               :key="group.name">
+            <div class="scale" v-for="scale in group.scales" :key="scale">
+              <label>
+                <input
+                  type="checkbox"
+                  @change="onToggleScale(scale.name)"
+                  v-model="scale.active"/>
+                {{scale.name}}
+              </label>
+              <button @click.prevent="onPlayScale(scale.name)">Play</button>
+            </div>
           </div>
         </section>
 
@@ -90,16 +95,20 @@
 </template>
 
 <script>
-import ScalePlayer, { SCALE_NAMES } from '../audio/player.js';
+import ScalePlayer, { SCALES } from '../audio/player.js';
 
 export default {
   name: 'Player',
   data() {
+    const scales = [];
+    for (const [ name, { type } ] of SCALES) {
+      scales.push({ type, name, active: true });
+    }
+
     return {
       player: null,
+      scales,
 
-      scaleNames: SCALE_NAMES,
-      toggleScales: SCALE_NAMES.map(() => true),
       gain: 0.125,
       melody: '1,2,3,4,5,6,7,8',
       bpm: 120,
@@ -118,9 +127,13 @@ export default {
   },
 
   mounted() {
-    if (localStorage.toggleScales) {
-      this.toggleScales = JSON.parse(localStorage.toggleScales);
+    if (localStorage.scales) {
+      for (const [ name, active ] of JSON.parse(localStorage.scales)) {
+        const scale = this.scales.find((scale) => scale.name === name);
+        scale.active = !!active;
+      }
     }
+
     if (localStorage.best) {
       this.best = JSON.parse(localStorage.best);
     }
@@ -142,10 +155,28 @@ export default {
   },
 
   computed: {
-    selectedScales() {
-      return this.scaleNames.filter((_, i) => {
-        return this.toggleScales[i];
+    scaleGroups() {
+      return [ 'maj', 'min' ].map((groupName) => {
+        const group = [];
+        for (const scale of this.scales) {
+          if (scale.type === groupName) {
+            group.push(scale);
+          }
+        }
+
+        return {
+          name: groupName,
+          scales: group,
+        };
       });
+    },
+
+    scaleNames() {
+      return Array.from(SCALES.keys());
+    },
+
+    selectedScales() {
+      return this.scales.filter((scale) => scale.active);
     },
 
     matchedScale() {
@@ -250,7 +281,11 @@ export default {
     },
 
     persist() {
-      localStorage.toggleScales = JSON.stringify(this.toggleScales);
+      const scales = [];
+      for (const scale of this.scales) {
+        scales.push([ scale.name, scale.active ]);
+      }
+      localStorage.scales = JSON.stringify(scales);
       localStorage.best = JSON.stringify(this.best);
       localStorage.gain = JSON.stringify(this.gain);
       localStorage.melody = JSON.stringify(this.melody);
@@ -274,10 +309,6 @@ export default {
 .config .scale-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-}
-
-.config .scale-list .scale {
-  flex: 0;
 }
 
 .config .scale-list .scale button {
@@ -316,5 +347,9 @@ export default {
 
 .config .section:not(:last-child) {
   margin-bottom: 2rem;
+}
+
+.guess {
+  max-width: 16rem;
 }
 </style>

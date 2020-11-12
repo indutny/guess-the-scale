@@ -1,19 +1,20 @@
 import Synthesizer from './synthesizer';
 
-export const SCALES = {
-  'Ionian/Major': [ 0, 2, 4, 5, 7, 9, 11 ],
-  Dorian: [ 0, 2, 3, 5, 7, 9, 10 ],
-  Phrygian: [ 0, 1, 3, 5, 7, 8, 10 ],
-  Lydian: [ 0, 2, 4, 6, 7, 9, 11 ],
-  Mixolydian: [ 0, 2, 4, 5, 7, 9, 10 ],
-  'Aeolian/Natural minor': [ 0, 2, 3, 5, 7, 8, 10 ],
-  Locrian: [ 0, 1, 3, 5, 6, 8, 10 ],
+export const SCALES = new Map();
 
-  'Harmonic minor': [ 0, 2, 3, 5, 7, 8, 11 ],
-  'Melodic minor': [ 0, 2, 3, 5, 7, 9, 11 ],
-};
+function addScale(name, type, notes) {
+  SCALES.set(name, { type, notes });
+}
+addScale('Ionian/Major', 'maj', [ 0, 2, 4, 5, 7, 9, 11 ]);
+addScale('Mixolydian', 'maj', [ 0, 2, 4, 5, 7, 9, 10 ]);
+addScale('Lydian', 'maj', [ 0, 2, 4, 6, 7, 9, 11 ]);
 
-export const SCALE_NAMES = Object.keys(SCALES);
+addScale('Phrygian', 'min', [ 0, 1, 3, 5, 7, 8, 10 ]);
+addScale('Locrian', 'min', [ 0, 1, 3, 5, 6, 8, 10 ]);
+addScale('Melodic minor', 'min', [ 0, 2, 3, 5, 7, 9, 11 ]);
+addScale('Aeolian/Natural minor', 'min', [ 0, 2, 3, 5, 7, 8, 10 ]);
+addScale('Dorian', 'min', [ 0, 2, 3, 5, 7, 9, 10 ]);
+addScale('Harmonic minor', 'min', [ 0, 2, 3, 5, 7, 8, 11 ]);
 
 export default class Player {
   constructor() {
@@ -89,7 +90,7 @@ export default class Player {
 
     melody = this.parseMelody(melody);
 
-    const scale = SCALES[name];
+    const scale = SCALES.get(name).notes;
 
     if (base === undefined) {
       base = Math.floor(Math.random() * 12);
