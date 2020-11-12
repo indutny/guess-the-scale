@@ -212,7 +212,7 @@ export default {
       this.guess = '';
 
       this.scale = this.selectedScales[
-          (Math.random() * this.selectedScales.length) | 0];
+          (Math.random() * this.selectedScales.length) | 0].name;
 
       let newBase;
       do {
