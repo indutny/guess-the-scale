@@ -5,6 +5,7 @@
       /
       Best score: {{best}}
     </h3>
+    <h4 v-if="hitPercent">You got: {{hitPercent}} right!</h4>
 
     <span v-if="state === 'idle'">
       <button v-focus class="start" @click.prevent="onStart">Start</button>
@@ -116,6 +117,8 @@ export default {
       showConfig: false,
       state: 'idle',
       score: 0,
+      hits: 0,
+      total: 0,
       best: 0,
       streak: 0,
       multiplier: 1,
@@ -155,6 +158,14 @@ export default {
   },
 
   computed: {
+    hitPercent() {
+      if (this.total === 0) {
+        return '';
+      }
+
+      return (this.hits / this.total * 100).toFixed(1) + '%';
+    },
+
     scaleGroups() {
       return [ 'maj', 'min' ].map((groupName) => {
         const group = [];
@@ -242,6 +253,7 @@ export default {
     onGuess() {
       if (this.matchedScale === this.scale) {
         this.score += 100 * this.multiplier;
+        this.hits++;
         this.best = Math.max(this.best, this.score);
 
         this.streak += 1;
@@ -253,6 +265,7 @@ export default {
 
         this.onSkip();
       }
+      this.total++;
       this.persist();
       this.multiplier = 1 + Math.floor(Math.log(this.streak) / Math.log(2));
     },
