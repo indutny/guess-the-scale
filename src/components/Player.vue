@@ -246,13 +246,14 @@ export default {
 
         this.streak += 1;
 
-        this.persist();
         this.onStart();
       } else {
+        this.score = Math.max(this.score - 75, 0);
         this.streak = 1;
 
         this.onSkip();
       }
+      this.persist();
       this.multiplier = 1 + Math.floor(Math.log(this.streak) / Math.log(2));
     },
 
