@@ -271,6 +271,11 @@ export default {
     },
 
     onToggleScale() {
+      this.score = 0;
+      this.streak = 1;
+      this.total = 0;
+      this.hits = 0;
+
       this.state = 'idle';
       this.persist();
     },
